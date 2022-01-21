@@ -1,0 +1,50 @@
+name: Systemd images
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      # Expose matched filters as job 'packages' output variable
+      packages: ${{ steps.filter.outputs.changes }}
+    steps:
+    # For pull requests it's not necessary to checkout the code
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          centos-7:
+            - centos-7/Dockerfile
+          centos-8:
+            - centos-8/Dockerfile
+          debian-9:
+            - debian-9/Dockerfile
+          debian-10:
+            - debian-10/Dockerfile
+          fedora-30:
+            - fedora-30/Dockerfile
+          ubuntu-16.04:
+            - ubuntu-16.04/Dockerfile
+          ubuntu-18.04:
+            - ubuntu-18.04/Dockerfile
+  # JOB to build and test each of modified packages
+  build:
+    needs: changes
+    strategy:
+      matrix:
+        # Parse JSON array containing names of all filters matching any of changed files
+        # e.g. ['package1', 'package2'] if both package folders contains changes
+        package: ${{ fromJSON(needs.changes.outputs.packages) }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.package }}
+        run: |
+          cd ${{ matrix.package }}
+          docker build -t zhan9san/systemd:${{ matrix.package }} .
