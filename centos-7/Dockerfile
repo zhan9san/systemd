@@ -21,3 +21,4 @@ RUN yum install -y postgresql-server \
   && systemctl enable postgresql
 
 CMD ["/usr/lib/systemd/systemd"]
+
