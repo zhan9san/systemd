@@ -15,8 +15,8 @@ jobs:
       packages: ${{ steps.filter.outputs.changes }}
     steps:
       # For pull requests it's not necessary to checkout the code
-      # once there is a way to add conditional checkout in steps
       - uses: actions/checkout@v2
+        if: ${{ github.event_name == 'push' }}
       - uses: dorny/paths-filter@v2
         id: filter
         with:
