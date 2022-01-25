@@ -96,7 +96,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ./${{ matrix.package }}
-          file: ./${{ matrix.package }}/Dockerfile
+          file: Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ github.repository }}:${{ matrix.package }}
